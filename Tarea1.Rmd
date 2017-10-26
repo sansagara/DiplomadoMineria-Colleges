@@ -1,0 +1,127 @@
+---
+title: "Tarea 1 - Leonel Atencio - DM"
+output:
+  html_document: default
+  html_notebook: default
+  pdf_document: default
+---
+
+Este ejercicio se refiere al conjunto de datos College, que se puede encontrar
+en el archivo College.csv. Contiene una serie de variables para 777 diferentes
+universidades y escuelas superiores de los EE.UU.. Las variables son:
+
+- Private: Indicador público / privado
+- App: Número de solicitudes recibidas
+- Accept: Número de solicitantes aceptados
+- Enroll: Número de nuevos alumnos matriculados
+- Top10 perc: Estudiantes nuevos correspondiente al diez por ciento superior del “high school”
+- Top25 perc: Estudiantes nuevos correspondiente al veinticinco por ciento superior del “high school”
+- F.Undergrad: Número de estudiantes de tiempo completo
+- P.Undergrad: Número de estudiantes a tiempo parcial
+- Room.Board: los costos de pensión
+- Outstate: cantidad de estudiantes extranjeros.
+- Books: los costos estimados de libros
+- Personal: Se estima que el gasto personal
+- Phd: Porcentaje de profesores con doctorados
+- Terminal: Porcentaje de profesores con grado de terminales
+- S.F.Ratio: Proporción de estudiantes / profesores
+- perc.alumni: Porcentaje de alumnos que donan
+- Expend: Los gastos de instrucción por estudiante
+- Grad.Rate: Porcentaje de graduación
+  
+### Utilizar la función `read.csv ()` para leer los datos en R.
+```{r}
+library(readr)
+College <- read_delim("../College.csv", ";", escape_double = FALSE, trim_ws = TRUE)
+cols(
+  X1 = col_character(),
+  Private = col_character(),
+  Apps = col_integer(),
+  Accept = col_integer(),
+  Enroll = col_integer(),
+  Top10perc = col_integer(),
+  Top25perc = col_integer(),
+  F.Undergrad = col_integer(),
+  P.Undergrad = col_integer(),
+  Outstate = col_integer(),
+  Room.Board = col_integer(),
+  Books = col_integer(),
+  Personal = col_integer(),
+  PhD = col_integer(),
+  Terminal = col_integer(),
+  S.F.Ratio = col_number(),
+  perc.alumni = col_integer(),
+  Expend = col_integer(),
+  Grad.Rate = col_integer()
+)
+```
+*Nota:* He decidio usar la libreria `readr`, pues me parece un poco mas eficiente para esta labor. Carga las columnas con los valores esperados, y ademas se puede personalizar el nombre de cada una.
+
+### Utilice `summary()` para producir un resumen numérico de las variables del conjunto de datos.
+```{r}
+summary (College)
+```
+
+### Usa `pairs()` para producir una matriz de dispersión de las primeros diez columnas.
+```{r}
+pairs(College[, 3:12])
+```
+
+### Utilice la función `plot()` para producir gráficos de caja de lado a lado de Outstate vs Private.
+```{r}
+boxplot(College$Outstate ~ College$Private)
+```
+
+### Crear una nueva variable cualitativa, llamada “Elite”, para tratar la variable Top10perc.
+Vamos a dividir las universidades en dos grupos en función
+de si o no la proporción de los estudiantes que vienen del 10% superior de su escuela
+secundaria supera el 50%.
+```{r}
+Elite = rep ("No",nrow(College ))
+Elite [College$Top10perc >50]="Yes"
+Elite = as.factor (Elite)
+College = data.frame(College, Elite)
+```
+
+### Utilice `summary()` para ver que existen muchas universidades de élite.
+```{r}
+summary(Elite)
+```
+
+### Ahora usa la función `plot()` para producir de lado a lado los diagramas de caja de Outstate vs Elite.
+```{r}
+boxplot(College$Outstate ~ College$Elite)
+```
+Se puede concluir que las universidades de Elite, suelen tener mayor cantidad de estudiantes foraneos.
+
+### Utilizar la función `hist()` para producir algunos histogramas.
+```{r}
+hist(College$App)
+hist(College$Accept)
+hist(College$Enroll)
+hist(College$Outstate)
+```
+*Nota:* Como muestro el informe en forma de Notebook, no es necesario realizar la division del area grafica.
+
+### Continuar explorando los datos, y proporcionar un breve resumen de lo que se descubre.
+Creare dos DataFrames separados para cada valor de la nueva columna `Elite`. Es esta manera, puedo realizar comparaciones directamente sobre la data. Quiero explorar las diferencias entre las Universidades de elite y las regulares.
+
+```{r}
+College_Elite <- College[College$Elite == 'Yes',]
+College_Non_Elite <- College[College$Elite == 'No',]
+```
+
+Ahora, comparare la cantidad de estudiantes foraneos en las universidades de elite vs las regulares. Esta vez usando histogramas. Usare los mismos limites en `X` y `Y`.
+
+```{r}
+hist(College_Elite$Outstate, xlim=c(2000, 22000), breaks=seq(2000, 22000, 1000))
+hist(College_Non_Elite$Outstate, xlim=c(2000, 22000), breaks=seq(2000, 22000, 1000))
+```
+
+Comparare este valor, con la cantidad de estudiantes aceptados en general:
+
+```{r}
+hist(College_Elite$Accept, xlim=c(0, 30000), ylim = c(0, 500))
+hist(College_Non_Elite$Accept, xlim=c(0, 30000), ylim = c(0, 500))
+```
+
